@@ -31,11 +31,15 @@ function Register() {
     theme:"dark",
   }
 
+  useEffect(() => {
+    if(localStorage.getItem('chat-app-user')){
+      navigate ("/");
+    }
+  }, []); 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if(handleValidation()){
-      console.log("values ok",registreRoute);
       const {password,confirmPassword,username,email} = values;
       const {data} = await axios.post(registreRoute,{username,email,password});
       if(data.status === true){
@@ -44,6 +48,7 @@ function Register() {
           "Registered successfully! Please login to continue",
           toastOptions
           );
+          navigate ("/");
       }
       if(data.status === false){
         toast.error(
@@ -51,7 +56,7 @@ function Register() {
           toastOptions
           );
       }
-      navigate ("/");
+      
     }
   }
   
