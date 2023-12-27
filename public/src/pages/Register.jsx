@@ -1,19 +1,95 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
+import {ToastContainer,toast} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { registreRoute } from "../utils/APIRoutes";
+import { Navigate, useNavigate } from "react-router-dom";
+//import { set } from "mongoose";
 
 
 
 function Register() {
+  const navigate=useNavigate();
 
-  const handleSubmit = (event) => {
+  const [values, setValues] = useState({
+    username: "",
+    email:"",
+    password:"",
+    confirmPassword:"",
+  });
+
+  const toastOptions = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme:"dark",
+  }
+
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    alert("You have registered!");
+    if(handleValidation()){
+      console.log("values ok",registreRoute);
+      const {password,confirmPassword,username,email} = values;
+      const {data} = await axios.post(registreRoute,{username,email,password});
+      if(data.status === true){
+        localStorage.setItem('chat-app-user',JSON.stringify(data.user));
+        toast.success(
+          "Registered successfully! Please login to continue",
+          toastOptions
+          );
+      }
+      if(data.status === false){
+        toast.error(
+          data.message,
+          toastOptions
+          );
+      }
+      navigate ("/");
+    }
+  }
+  
+  
+
+  const handleValidation = () => {
+    const {password,confirmPassword,username,email} = values;
+    if(password !== confirmPassword){
+      toast.error(
+        "Passwords and confirm password should be same!",
+        toastOptions
+        );
+        return false;
+    }else if(username.length < 3){
+      toast.error(
+        "Username should be atleast 3 characters long!",
+        toastOptions
+        );
+        return false;
+    }else if(password.length < 8){
+      toast.error(
+        "Password should be atleast 8 characters long!",
+        toastOptions
+        );
+        return false;
+    }else if(email===""){
+        toast.error(
+          "Email should not be empty!",
+          toastOptions
+          );
+          return false;
+      }
+    
+    return true;
   }
 
   const handleChange = (event) => {
-
+      setValues({...values,[event.target.name]:event.target.value});
   }
   return (
     <>
@@ -26,11 +102,13 @@ function Register() {
           <input type="text" placeholder="Username" name="username" onChange={(e)=>handleChange(e)}/>
           <input type="email" placeholder="Email" name="email" onChange={(e)=>handleChange(e)}/>
           <input type="password" placeholder="Password" name="password" onChange={(e)=>handleChange(e)}/>
-          <input type="password" placeholder="Confirm Password" name="confimPassword" onChange={(e)=>handleChange(e)}/>
+          <input type="password" placeholder="Confirm Password" name="confirmPassword" onChange={(e)=>handleChange(e)}/>
           <button type="submit">Register</button>
           <span>Already have an account? <a href="/login">Login</a></span>
         </form>
       </FormContainer>
+      <ToastContainer/>
+      
     </>);
 }
 
