@@ -1,5 +1,6 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcrypt");
+const { use } = require("../routes/userRoutes");
 
 module.exports.register =async (req,res,next)=>{
     try{
@@ -37,6 +38,24 @@ module.exports.login =async (req,res,next)=>{
         return res.json({status:true,user});
     }catch(err){
         return res.status(500).json({message:err.message});
+    }
+    
+};
+
+module.exports.setAvatar =async (req,res,next)=>{
+    try{
+        const userId=req.params.id;
+        const avataraImage=req.body.image;
+        const userData=await User.findByIdAndUpdate(userId,{
+            isAvatarImageSet:true,
+            avataraImage,
+        });
+        return res.json({
+            isSet:userData.isAvatarImageSet,
+            iamge:userData.avataraImage,
+        });
+    }catch(err){
+        next(err);
     }
     
 };
