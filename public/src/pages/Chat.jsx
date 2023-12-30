@@ -10,6 +10,7 @@ function Chat() {
   const navigate=useNavigate();
   const [contacts, setContacts] = useState([]);
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [currentChat, setCurrentChat] = useState(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,10 +46,14 @@ function Chat() {
     fetchData();
   }, [currentUser]);
   
+  const handleChatChange = (Chat) => {
+    setCurrentChat(Chat);
+  }
+
   return (
     <Container>
       <div className="container">
-        <Contacts contacts={contacts} currentUser={currentUser}/>
+        <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange}/>
       </div>
     </Container>
   );
@@ -63,6 +68,7 @@ const Container = styled.div`
   gap: 1rem;
   align-items: center;
   background-color: #131324;
+  
   .container{
     height: 85vh;
     width: 85vw;
@@ -70,7 +76,7 @@ const Container = styled.div`
     display:grid;
     grid-template-columns: 25% 75%;
     @media screen and (min-width: 720px) and (max-width: 1080px){
-      grid-template-columns: 135% 65%;
+      grid-template-columns: 35% 65%;
     }
 
   }
