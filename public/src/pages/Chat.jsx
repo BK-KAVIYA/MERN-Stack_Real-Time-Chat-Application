@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Contacts from "../components/Contacts";
 import { allUsersRoute } from "../utils/APIRoutes";
 
+
 function Chat() {
   const navigate=useNavigate();
   const [contacts, setContacts] = useState([]);
@@ -27,9 +28,11 @@ function Chat() {
     const fetchData = async () => {
       if (currentUser) {
         if (currentUser.isAvatarImageSet) {
+          
           try {
             const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
             setContacts(data.data);
+            
           } catch (error) {
             // Handle errors here
           }
@@ -69,6 +72,7 @@ const Container = styled.div`
     @media screen and (min-width: 720px) and (max-width: 1080px){
       grid-template-columns: 135% 65%;
     }
+
   }
 `;
 
