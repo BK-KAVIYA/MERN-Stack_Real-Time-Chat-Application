@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messagesRoutes');
-const { Socket } = require('socket.io');
+const  socket  = require('socket.io');
 const { sourceMapsEnabled } = require('process');
 
 const app = express();
@@ -23,25 +23,25 @@ const server=app.listen(process.env.PORT || 5000,()=>{
     console.log(`Server is running on port: ${process.env.PORT}`);
 });
 
-const io = Socket(server,{
+const io = socket(server,{
     cors:{
-        origin:"hhtp://localhost:3000",
-        Credentials:true,
+        origin:"http://localhost:3000",
+        credentials:true,
     },
 });
 
-global.onlineUser=new Map();
+global.onlineUsers=new Map();
 
 io.on("connection",(socket)=>{
     global.chatSocket=socket;
     socket.on("add-user",(userId)=>{
-        onlineUser.set(userId,socket.id);
+        onlineUsers.set(userId,socket.id);
     });
 
     socket.on("send-msg",(data)=>{
         const sendUserSocket=onlineUsers.get(data.to);
         if(sendUserSocket){
-            socket.to(sendUserSocket).emit("msg-recieve",data.msg);
+            socket.to(sendUserSocket).emit("msg-recieve",data.message);
         }
        
     });

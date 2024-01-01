@@ -7,10 +7,10 @@ module.exports.register =async (req,res,next)=>{
         const{username,email,password}=req.body;
         const usernameCheck=await User.findOne({username});
         if(usernameCheck)
-            return res.status(400).json({message:"Username already exists"});
+            return res.json({message:"Username already exists",status:false});
         const emailCheck=await User.findOne({email});
         if(emailCheck)
-            return res.status(400).json({message:"Email already exists"});
+            return res.json({message:"Email already exists",status:false});
         const hashedPassword=await bcrypt.hash(password,10);
         const user= await User.create({
             username,
@@ -18,9 +18,9 @@ module.exports.register =async (req,res,next)=>{
             password:hashedPassword,
         });
         delete user.password;
-        return res.status(201).json(user);
+        return res.jsons({status:true,user});
     }catch(err){
-        return res.status(500).json({message:err.message});
+        next(err);
     }
     
 };

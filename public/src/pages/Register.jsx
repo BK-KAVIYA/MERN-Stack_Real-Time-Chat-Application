@@ -44,11 +44,7 @@ function Register() {
       const {data} = await axios.post(registreRoute,{username,email,password});
       if(data.status === true){
         localStorage.setItem('chat-app-user',JSON.stringify(data.user));
-        toast.success(
-          "Registered successfully! Please login to continue",
-          toastOptions
-          );
-          navigate ("/");
+          navigate ("/login");
       }
       if(data.status === false){
         toast.error(
