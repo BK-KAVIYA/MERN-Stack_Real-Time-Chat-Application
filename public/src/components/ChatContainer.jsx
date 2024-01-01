@@ -5,11 +5,14 @@ import ChatInput from "./ChatInput";
 import Messages from "./Messages";
 import axios from "axios";
 import { getAllMessagesRoute, sendMessageRoute } from "../utils/APIRoutes";
+import { set } from "mongoose";
+import { use } from "../../../server/routes/userRoutes";
 
 
-export default function ChatContainer({currentChat,currentUser}) {
+export default function ChatContainer({currentChat,currentUser,socket}) {
 
     const [messages, setMessages] = useState([]);
+    const [arivalMsg, setArivalMsg] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -32,7 +35,39 @@ export default function ChatContainer({currentChat,currentUser}) {
             to: currentChat._id,
             message: msg,
         });
+        socket.current.emit("send-msg", {
+            from: currentUser._id,
+            to: currentChat._id,
+            message: msg,
+        });
+
+        const msgs= [...messages];
+        msgs.push({
+            fromSelf: true,
+            message: msg,
+        });
+        setMessages(msgs);
     }
+
+    useEffect(() => {
+        if(socket.current){
+            socket.current.on("msg-receive", (msg) => {
+                setArivalMsg({
+                    fromSelf: false,
+                    message: msg,
+                });
+            });
+        }
+      }, []);
+
+
+    useEffect(() => {
+            arivalMsg && setArivalMsg((prev)=>[...prev,arivalMsg]);
+      }, [arivalMsg]);
+
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({behavior: "smooth"});
+      }, []);
     return( 
         <>
         {
